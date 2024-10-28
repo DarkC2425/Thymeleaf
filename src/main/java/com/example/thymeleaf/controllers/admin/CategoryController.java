@@ -31,7 +31,7 @@ import com.example.thymeleaf.services.CategoryService;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("admin/categories")
+@RequestMapping("/admin/categories")
 public class CategoryController {
 	@Autowired
 	CategoryService categoryService;
@@ -40,7 +40,7 @@ public class CategoryController {
 	public String list(Model model) {
 		List<Category> listcate = categoryService.findAll();
 		model.addAttribute("listcate", listcate);
-		return "admin/category-list";
+		return "admin/categories/list";
 	}
 
 	@GetMapping("add")
@@ -48,14 +48,14 @@ public class CategoryController {
 		CategoryModel categoryModel = new CategoryModel();
 		categoryModel.setIsEdit(false);
 		model.addAttribute("category", categoryModel);
-		return "admin/category-edit";
+		return "admin/categories/edit";
 	}
 
 	@PostMapping("saveOrUpdate")
 	public ModelAndView saveOrUpdate(ModelMap model, @Valid @ModelAttribute("category") CategoryModel categoryModel,
 			BindingResult result) {
 		if (result.hasErrors()) {
-			return new ModelAndView("addmin/category-edit");
+			return new ModelAndView("admin/categories/edit");
 		}
 		Category entity = new Category();
 		BeanUtils.copyProperties(categoryModel, entity);
@@ -77,8 +77,9 @@ public class CategoryController {
 		if (optional.isPresent()) {
 			Category entity = optional.get();
 			BeanUtils.copyProperties(entity, categoryModel);
+			categoryModel.setIsEdit(true);
 			model.addAttribute("category", categoryModel);
-			return new ModelAndView("admin/category-edit");
+			return new ModelAndView("admin/categories/edit");
 		}
 		model.addAttribute("message", "Category is not existed!!!");
 		return new ModelAndView("forward:/admin/categories", model);
@@ -110,11 +111,11 @@ public class CategoryController {
 		int count = (int) categoryService.count();
 		int currentPage = page.orElse(1);
 		int pageSize = size.orElse(3);
-		Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by("name"));
+		Pageable pageable = PageRequest.of(currentPage - 1, pageSize, Sort.by("categoryname"));
 		Page<Category> resultPage = null;
 		if (StringUtils.hasText(categoryname)) {
-			resultPage = categoryService.findByNameContaining(categoryname, pageable);
-			model.addAttribute("name", categoryname);
+			resultPage = categoryService.findByCategorynameContaining(categoryname, pageable);
+			model.addAttribute("categoryname", categoryname);
 		} else {
 			resultPage = categoryService.findAll(pageable);
 		}

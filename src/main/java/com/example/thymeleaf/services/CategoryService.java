@@ -22,7 +22,7 @@ public interface CategoryService {
 
 	<S extends Category> S save(S entity);
 
-	Page<Category> findByNameContaining(String categoryname, Pageable pageable);
+	Page<Category> findByCategorynameContaining(String categoryname, Pageable pageable);
 
 	Page<Category> findAll(Pageable pageable);
 }
